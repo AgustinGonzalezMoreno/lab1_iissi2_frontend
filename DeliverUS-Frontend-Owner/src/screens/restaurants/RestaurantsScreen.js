@@ -8,29 +8,36 @@ import restaurantLogo from '../../../assets/restaurantLogo.jpeg'
 import { API_BASE_URL } from '@env'
 
 export default function RestaurantsScreen({ navigation, route }) {
-  return (
-    <View style={styles.container}>
-      <TextRegular style={{ fontSize: 16, alignSelf: 'center', margin: 20 }}>
-        Random Restaurant
-      </TextRegular>
+  const [restaurants, setRestaurants] = useState([])
+
+  useEffect(() => {
+    console.log('Loading restaurants, please wait 2 seconds')
+    setTimeout(() => {
+      setRestaurants(getAll)
+      console.log('Restaurants loaded')
+    }, 2000)
+  }, [])
+
+  const renderRestaurant = ({ item }) => {
+    return (
       <Pressable
+        style={styles.row}
         onPress={() => {
-          navigation.navigate('RestaurantDetailScreen', {
-            id: Math.floor(Math.random() * 100)
-          })
+          navigation.navigate('RestaurantDetailScreen', { id: item.id })
         }}
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed
-              ? GlobalStyles.brandBlueTap
-              : GlobalStyles.brandBlue
-          },
-          styles.actionButton
-        ]}
       >
-        <TextRegular textStyle={styles.text}>Restaurant Details</TextRegular>
+        <TextRegular>{item.name}</TextRegular>
       </Pressable>
-    </View>
+    )
+  }
+
+  return (
+    <FlatList
+      style={styles.container}
+      data={restaurants}
+      renderItem={renderRestaurant}
+      keyExtractor={item => item.id.toString()}
+    />
   )
 }
 
@@ -38,39 +45,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  button: {
-    borderRadius: 8,
-    height: 40,
-    marginTop: 12,
-    padding: 10,
-    alignSelf: 'center',
-    flexDirection: 'row',
-    width: '80%'
-  },
-  actionButton: {
-    borderRadius: 8,
-    height: 40,
-    marginTop: 12,
-    margin: '1%',
-    padding: 10,
-    alignSelf: 'center',
-    flexDirection: 'column',
-    width: '50%'
-  },
-  actionButtonsContainer: {
-    flexDirection: 'row',
-    bottom: 5,
-    position: 'absolute',
-    width: '90%'
-  },
-  text: {
-    fontSize: 16,
-    color: 'white',
-    alignSelf: 'center',
-    marginLeft: 5
-  },
-  emptyList: {
-    textAlign: 'center',
-    padding: 50
+  row: {
+    padding: 15,
+    marginBottom: 5,
+    backgroundColor: GlobalStyles.brandSecondary
   }
 })
