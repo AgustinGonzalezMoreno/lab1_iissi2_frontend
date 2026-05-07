@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react'
-import { StyleSheet, View, FlatList, Pressable } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Pressable,
+  Image,
+  ImageBackground
+} from 'react-native'
 import { getDetail } from '../../api/RestaurantEndpoints'
 import TextRegular from '../../components/TextRegular'
+import TextSemiBold from '../../components/TextSemiBold'
 import * as GlobalStyles from '../../styles/GlobalStyles'
 
 export default function RestaurantDetailScreen({ route }) {
@@ -15,6 +23,44 @@ export default function RestaurantDetailScreen({ route }) {
     }, 1000)
   }, [])
 
+  const renderHeader = () => {
+    return (
+      <ImageBackground
+        source={
+          restaurant?.heroImage
+            ? {
+                uri: process.env.API_BASE_URL + '/' + restaurant.heroImage,
+                cache: 'force-cache'
+              }
+            : undefined
+        }
+        style={styles.imageBackground}
+      >
+        <View style={styles.restaurantHeaderContainer}>
+          <TextSemiBold textStyle={styles.textTitle}>
+            {restaurant.name}
+          </TextSemiBold>
+
+          <Image
+            style={styles.image}
+            source={
+              restaurant.logo
+                ? {
+                    uri: process.env.API_BASE_URL + '/' + restaurant.logo,
+                    cache: 'force-cache'
+                  }
+                : undefined
+            }
+          />
+
+          <TextRegular textStyle={styles.text}>
+            {restaurant.description}
+          </TextRegular>
+        </View>
+      </ImageBackground>
+    )
+  }
+
   const renderProduct = ({ item }) => {
     return (
       <Pressable style={styles.row} onPress={() => {}}>
@@ -24,22 +70,13 @@ export default function RestaurantDetailScreen({ route }) {
   }
 
   return (
-    <View style={styles.container}>
-      <TextRegular style={styles.textTitle}>{restaurant.name}</TextRegular>
-
-      <TextRegular style={styles.text}>{restaurant.description}</TextRegular>
-
-      <TextRegular style={styles.text}>
-        shippingCosts: {restaurant.shippingCosts}
-      </TextRegular>
-
-      <FlatList
-        style={styles.container}
-        data={restaurant.products}
-        renderItem={renderProduct}
-        keyExtractor={item => item.id.toString()}
-      />
-    </View>
+    <FlatList
+      style={styles.container}
+      data={restaurant.products || []}
+      renderItem={renderProduct}
+      keyExtractor={item => item.id.toString()}
+      ListHeaderComponent={renderHeader}
+    />
   )
 }
 
@@ -52,12 +89,28 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     backgroundColor: GlobalStyles.brandSecondary
   },
+  restaurantHeaderContainer: {
+    height: 250,
+    padding: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  imageBackground: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center'
+  },
+  image: {
+    height: 100,
+    width: 100,
+    margin: 10
+  },
   text: {
-    marginHorizontal: 10,
-    marginBottom: 10
+    color: 'white'
   },
   textTitle: {
     fontSize: 20,
-    margin: 10
+    color: 'white'
   }
 })
